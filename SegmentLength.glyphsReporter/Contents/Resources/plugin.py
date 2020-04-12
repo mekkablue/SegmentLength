@@ -1,4 +1,5 @@
 # encoding: utf-8
+from __future__ import division, print_function, unicode_literals
 
 ###########################################################################################################
 #
@@ -15,6 +16,7 @@ import objc
 from GlyphsApp import *
 from GlyphsApp.plugins import *
 
+@objc.python_method
 def bezier( P1, P2, P3, P4, t ):
 	"""
 	Returns coordinates for t (=0.0...1.0) on curve segment.
@@ -26,18 +28,24 @@ def bezier( P1, P2, P3, P4, t ):
 
 	return NSPoint(x, y)
 
+@objc.python_method
+def distance( p0, p1 ):
+	return ( (p1.x-p0.x)**2 + (p1.y-p0.y)**2 )**0.5
+
+@objc.python_method
 def approxLengthOfSegment(segment):
 	if len(segment) == 2:
 		p0,p1 = segment
-		return ( (p1.x-p0.x)**2 + (p1.y-p0.y)**2 )**0.5
+		return distance(p0,p1)
 	elif len(segment) == 4:
 		p0,p1,p2,p3 = segment
 		chord = distance(p0,p3)
 		cont_net = distance(p0,p1) + distance(p1,p2) + distance(p2,p3)
 		return (cont_net + chord) * 0.5 * 0.996767352316
 	else:
-		print "Segment has unexpected length:\n" + segment
+		print("Segment has unexpected length:\n" + segment)
 
+@objc.python_method
 def segmentMiddle(segment):
 	if len(segment) == 2:
 		p0,p1 = segment
@@ -46,23 +54,36 @@ def segmentMiddle(segment):
 		p0,p1,p2,p3 = segment
 		return bezier(p0,p1,p2,p3,0.5)
 	else:
-		print "Segment has unexpected length:\n" + segment
-
+		print("Segment has unexpected length:\n" + segment)
 
 class SegmentLength(ReporterPlugin):
 
+	@objc.python_method
 	def settings(self):
 		self.menuName = Glyphs.localize({
-			'en': u'Segment Lengths',
-			'de': u'Segmentlängen',
+			'en': 'Segment Lengths',
+			'de': 'Segmentlängen',
+			'fr': 'longueurs de segments',
+			'es': 'longitudos de segmentos',
 		})
-		
+	
+	@objc.python_method
 	def foreground(self, layer):
 		for thisPath in layer.paths:
 			for thisSegment in thisPath.segments:
-				points = [p.pointValue() for p in thisSegment]
+				try:
+					# GLYPHS 2:
+					points = [p.pointValue() for p in thisSegment]
+				except:
+					# GLYPHS 3:
+					points = []
+					for i in range(len(thisSegment)):
+						points.append(thisSegment[i])
 				segmentLength = approxLengthOfSegment(points)
 				middlePosition = segmentMiddle(points)
 				self.drawTextAtPoint( "%.1f"%segmentLength, middlePosition, fontColor=NSColor.redColor() )
 
-	
+	@objc.python_method
+	def __file__(self):
+		"""Please leave this method unchanged"""
+		return __file__
