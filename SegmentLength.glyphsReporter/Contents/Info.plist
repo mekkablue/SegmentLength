@@ -13,15 +13,15 @@
 	<key>CFBundleName</key>
 	<string>SegmentLength</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>3</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0</string>
+	<string>2.0.1</string>
 	<key>UpdateFeedURL</key>
 	<string>https://raw.githubusercontent.com/mekkablue/SegmentLength/master/SegmentLength.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>
 	<string>https://github.com/mekkablue/SegmentLength</string>
 	<key>productReleaseNotes</key>
-	<string>Glyphs 3 update.</string>
+	<string>Glyphs 3 update, better precision for curves.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright, Rainer Erich Scheichelbauer, 2018</string>
 	<key>NSPrincipalClass</key>

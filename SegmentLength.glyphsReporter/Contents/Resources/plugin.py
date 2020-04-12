@@ -33,15 +33,23 @@ def distance( p0, p1 ):
 	return ( (p1.x-p0.x)**2 + (p1.y-p0.y)**2 )**0.5
 
 @objc.python_method
-def approxLengthOfSegment(segment):
+def approxLengthOfSegment(segment, precision=20):
 	if len(segment) == 2:
 		p0,p1 = segment
 		return distance(p0,p1)
 	elif len(segment) == 4:
 		p0,p1,p2,p3 = segment
-		chord = distance(p0,p3)
-		cont_net = distance(p0,p1) + distance(p1,p2) + distance(p2,p3)
-		return (cont_net + chord) * 0.5 * 0.996767352316
+		previousPoint = p0
+		length = 0
+		for i in range(precision):
+			t = (i+1)/precision
+			currentPoint = bezier( p0,p1,p2,p3, t )
+			length += distance(previousPoint,currentPoint)
+			previousPoint = currentPoint
+		return length
+		# chord = distance(p0,p3)
+		# cont_net = distance(p0,p1) + distance(p1,p2) + distance(p2,p3)
+		# return (cont_net + chord) * 0.5 * 0.996767352316
 	else:
 		print("Segment has unexpected length:\n" + segment)
 
