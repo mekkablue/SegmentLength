@@ -33,7 +33,7 @@ def distance( p0, p1 ):
 	return ( (p1.x-p0.x)**2 + (p1.y-p0.y)**2 )**0.5
 
 @objc.python_method
-def approxLengthOfSegment(segment, precision=20):
+def approxLengthOfSegment(segment, precision=25):
 	if len(segment) == 2:
 		p0,p1 = segment
 		return distance(p0,p1)
@@ -42,7 +42,7 @@ def approxLengthOfSegment(segment, precision=20):
 		previousPoint = p0
 		length = 0
 		for i in range(precision):
-			t = (i+1)/precision
+			t = (i+1.0)/precision
 			currentPoint = bezier( p0,p1,p2,p3, t )
 			length += distance(previousPoint,currentPoint)
 			previousPoint = currentPoint
@@ -74,9 +74,11 @@ class SegmentLength(ReporterPlugin):
 			'fr': 'longueurs de segments',
 			'es': 'longitudos de segmentos',
 		})
+		Glyphs.registerDefault( "com.mekkablue.SegmentLength.precision", 25 )
 	
 	@objc.python_method
 	def foreground(self, layer):
+		precision = max(Glyphs.defaults["com.mekkablue.SegmentLength.precision"],4)
 		for thisPath in layer.paths:
 			for thisSegment in thisPath.segments:
 				try:
@@ -87,7 +89,7 @@ class SegmentLength(ReporterPlugin):
 					points = []
 					for i in range(len(thisSegment)):
 						points.append(thisSegment[i])
-				segmentLength = approxLengthOfSegment(points)
+				segmentLength = approxLengthOfSegment(points, precision=precision)
 				middlePosition = segmentMiddle(points)
 				self.drawTextAtPoint( "%.1f"%segmentLength, middlePosition, fontColor=NSColor.redColor() )
 
